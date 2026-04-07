@@ -66,10 +66,10 @@ MeetingCost.App = (function () {
   // -----------------------------------------------------------
 
   function _initToast() {
-    document.addEventListener('toast:show', function (evt) {
-      var container = document.getElementById('toast-container');
-      if (!container) return;
+    var container = document.getElementById('toast-container');
 
+    document.addEventListener('toast:show', function (evt) {
+      if (!container) return;
       var message = evt.detail && evt.detail.message ? evt.detail.message : '';
 
       var toast = document.createElement('div');
@@ -80,9 +80,38 @@ MeetingCost.App = (function () {
       setTimeout(function () {
         toast.classList.add('toast--dismiss');
         setTimeout(function () {
-          if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-          }
+          if (toast.parentNode) { toast.parentNode.removeChild(toast); }
+        }, 300);
+      }, 3000);
+    });
+
+    document.addEventListener('toast:show-undo', function (evt) {
+      if (!container) return;
+      var detail = evt.detail || {};
+      var message = detail.message || '';
+      var onUndo = detail.onUndo;
+
+      var toast = document.createElement('div');
+      toast.className = 'toast toast--undo';
+
+      var textSpan = document.createElement('span');
+      textSpan.textContent = message;
+      toast.appendChild(textSpan);
+
+      var undoBtn = document.createElement('button');
+      undoBtn.className = 'toast__undo-btn';
+      undoBtn.textContent = '되돌리기';
+      undoBtn.addEventListener('click', function () {
+        if (typeof onUndo === 'function') { onUndo(); }
+        if (toast.parentNode) { toast.parentNode.removeChild(toast); }
+      });
+      toast.appendChild(undoBtn);
+      container.appendChild(toast);
+
+      setTimeout(function () {
+        toast.classList.add('toast--dismiss');
+        setTimeout(function () {
+          if (toast.parentNode) { toast.parentNode.removeChild(toast); }
         }, 300);
       }, 3000);
     });
@@ -103,6 +132,86 @@ MeetingCost.App = (function () {
     if (btn) {
       btn.textContent = theme === 'dark' ? '🌙' : '☀️';
     }
+  }
+
+  // -----------------------------------------------------------
+  // Memo Modal
+  // -----------------------------------------------------------
+
+  var _pendingRecord = null;
+
+  function _todayStr() {
+    var now = new Date();
+    var y = now.getFullYear();
+    var m = now.getMonth() + 1;
+    var d = now.getDate();
+    var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+    return y + '-' + pad(m) + '-' + pad(d);
+  }
+
+  function _initMemoModal() {
+    var modal       = document.getElementById('memo-modal');
+    var titleInput  = document.getElementById('memo-title');
+    var contentInput = document.getElementById('memo-content');
+    var saveBtn     = document.getElementById('memo-save');
+    var skipBtn     = document.getElementById('memo-skip');
+
+    function showModal() {
+      if (!modal) return;
+      titleInput.value = '';
+      contentInput.value = '';
+      modal.style.display = '';
+      modal.offsetHeight; // trigger reflow
+      modal.classList.add('modal-overlay--visible');
+      titleInput.focus();
+    }
+
+    function hideModal() {
+      if (!modal) return;
+      modal.classList.remove('modal-overlay--visible');
+      setTimeout(function() { modal.style.display = 'none'; }, 300);
+    }
+
+    function saveRecord(title, memo) {
+      if (!_pendingRecord) return;
+      _pendingRecord.title = title || '';
+      _pendingRecord.memo  = memo || '';
+      MeetingCost.History.add(_pendingRecord);
+      document.dispatchEvent(new CustomEvent('history:updated'));
+      _pendingRecord = null;
+    }
+
+    if (saveBtn) {
+      saveBtn.addEventListener('click', function () {
+        saveRecord(titleInput.value.trim(), contentInput.value.trim());
+        hideModal();
+        MeetingCost.Timer.reset();
+      });
+    }
+
+    if (skipBtn) {
+      skipBtn.addEventListener('click', function () {
+        saveRecord('', '');
+        hideModal();
+        MeetingCost.Timer.reset();
+      });
+    }
+
+    document.addEventListener('memo:request', function (evt) {
+      var detail = evt.detail || {};
+      _pendingRecord = {
+        id:         String(Date.now()),
+        date:       _todayStr(),
+        duration:   detail.elapsed || 0,
+        attendees:  MeetingCost.Settings.getAttendees(),
+        hourlyRate: MeetingCost.Settings.getHourlyRate(),
+        totalCost:  MeetingCost.Cost.getTotalCost(),
+        currency:   MeetingCost.Settings.getCurrency(),
+        title:      '',
+        memo:       ''
+      };
+      showModal();
+    });
   }
 
   // -----------------------------------------------------------
@@ -144,6 +253,9 @@ MeetingCost.App = (function () {
 
     // 12. Wire toast system
     _initToast();
+
+    // 13. Wire memo modal
+    _initMemoModal();
   }
 
   // -----------------------------------------------------------

@@ -330,25 +330,6 @@ MeetingCost.History = (function () {
     render();
   }
 
-  function _onTimerStop(evt) {
-    var elapsed = (evt.detail && typeof evt.detail.elapsed === 'number') ? evt.detail.elapsed : 0;
-    if (elapsed < 1) return;  // Don't save zero-duration meetings
-
-    var record = {
-      id:         String(Date.now()),
-      date:       _todayStr(),
-      duration:   elapsed,
-      attendees:  MeetingCost.Settings.getAttendees(),
-      hourlyRate: MeetingCost.Settings.getHourlyRate(),
-      totalCost:  MeetingCost.Cost.getTotalCost(),
-      currency:   MeetingCost.Settings.getCurrency()
-    };
-
-    add(record);
-
-    // Notify stats module
-    document.dispatchEvent(new CustomEvent('history:updated'));
-  }
 
   function init() {
     _listEl  = document.getElementById('history-list');
@@ -358,7 +339,6 @@ MeetingCost.History = (function () {
     _load();
     render();
 
-    document.addEventListener('timer:stop', _onTimerStop);
   }
 
   return {

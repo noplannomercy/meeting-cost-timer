@@ -192,7 +192,26 @@ MeetingCost.Timer = (function () {
     if (_btnReset) {
       _btnReset.addEventListener('click', function () {
         if (_state === STATE_RUNNING || _state === STATE_PAUSED) {
-          stop();
+          clearInterval(_intervalId);
+          _intervalId = null;
+
+          if (_state === STATE_RUNNING) {
+            _elapsed = Math.floor((Date.now() - _startTime - _pausedDuration) / 1000);
+          }
+
+          var finalElapsed = _elapsed;
+
+          if (finalElapsed >= 1) {
+            _dispatch('memo:request', { elapsed: finalElapsed });
+            _state          = STATE_IDLE;
+            _elapsed        = 0;
+            _startTime      = 0;
+            _pausedAt       = 0;
+            _pausedDuration = 0;
+            _updateDisplay();
+            _updateButtons();
+            return;
+          }
         }
         reset();
       });
