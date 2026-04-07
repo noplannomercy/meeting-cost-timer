@@ -808,3 +808,18 @@ git commit -m "polish: edge cases, cross-browser fixes, gitignore"
 
 **Critical path:** 0 → 1 → 2 → 3 → 4 → 5 → 11
 **Parallel possible:** Tasks 6, 7, 8 can run in parallel after Task 4/5.
+
+## ENG REVIEW NOTE (2026-04-07)
+
+**Change from review:** Task 4 (Timer) — `requestAnimationFrame` 대신 `setInterval(1000)` + `Date.now()` 보정 사용. 초당 60회 이벤트 → 1회로 감소. Odometer.js가 자체 보간하므로 부드러움 유지.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | CLEAR | mode: HOLD_SCOPE, 0 critical gaps |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | CLEAR | 1 issue (tick rate), 0 critical gaps |
+| Design Review | `/plan-design-review` | UI/UX gaps | 0 | — | — |
+
+**VERDICT:** CEO + ENG CLEARED — ready to implement.
