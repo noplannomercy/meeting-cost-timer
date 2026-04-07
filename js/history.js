@@ -46,15 +46,6 @@ MeetingCost.History = (function () {
     return 'cost--danger';
   }
 
-  function _todayStr() {
-    var now = new Date();
-    var y = now.getFullYear();
-    var m = now.getMonth() + 1;
-    var d = now.getDate();
-    var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
-    return y + '-' + pad(m) + '-' + pad(d);
-  }
-
   // -----------------------------------------------------------
   // Storage
   // -----------------------------------------------------------
@@ -224,6 +215,8 @@ MeetingCost.History = (function () {
 
         function onEnd() {
           if (!swiping) return;
+          item.setAttribute('data-swiped', 'true');
+          setTimeout(function() { item.removeAttribute('data-swiped'); }, 50);
           item.classList.remove('history-item--swiping');
 
           if (currentX < -60) {
@@ -268,7 +261,7 @@ MeetingCost.History = (function () {
       (function(item) {
         var content = item.querySelector('.history-item__content');
         content.addEventListener('click', function() {
-          if (item.classList.contains('history-item--swiping')) return;
+          if (item.classList.contains('history-item--swiping') || item.getAttribute('data-swiped')) return;
           item.classList.toggle('history-item--expanded');
         });
       })(items[i]);
