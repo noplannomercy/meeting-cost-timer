@@ -89,14 +89,13 @@ MeetingCost.Stats = (function () {
     var drawW = w - PADDING * 2;
     var drawH = CANVAS_HEIGHT - PADDING * 2;
 
-    function xAt(idx) {
+    var xAt = function(idx) {
       return PADDING + (idx / (n - 1)) * drawW;
-    }
+    };
 
-    function yAt(cost) {
-      // Invert: high cost => low y
+    var yAt = function(cost) {
       return PADDING + (1 - (cost - minCost) / range) * drawH;
-    }
+    };
 
     // Build point coords
     var pts = [];

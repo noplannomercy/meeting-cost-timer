@@ -24,6 +24,9 @@
   --stage-alert: #DB6D28;
   --stage-danger: #F85149;
   --info: #58A6FF;
+  --accent-hover: #E55A2B;
+  --btn-primary-text: #FFFFFF;
+  --danger-glow: rgba(248, 81, 73, 0.15);
 }
 
 [data-theme="light"] {
@@ -41,6 +44,9 @@
   --stage-alert: #DB6D28;
   --stage-danger: #F85149;
   --info: #58A6FF;
+  --accent-hover: #E55A2B;
+  --btn-primary-text: #FFFFFF;
+  --danger-glow: rgba(248, 81, 73, 0.15);
 }
 
 /* ============================================
@@ -372,13 +378,13 @@ body {
 
 .btn--primary {
   background-color: var(--accent);
-  color: #FFFFFF;
+  color: var(--btn-primary-text);
   border-color: var(--accent);
 }
 
 .btn--primary:hover {
-  background-color: #E55A2B;
-  border-color: #E55A2B;
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .btn--secondary {
@@ -462,7 +468,7 @@ body {
 
 .input.invalid {
   border-color: var(--stage-danger);
-  box-shadow: 0 0 0 3px rgba(248, 81, 73, 0.15);
+  box-shadow: 0 0 0 3px var(--danger-glow);
 }
 
 .input-error {

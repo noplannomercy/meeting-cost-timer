@@ -84,8 +84,8 @@ MeetingCost.Cost = (function () {
     if (!_costDisplay) return;
 
     if (_hasOdometer) {
-      // Odometer.js requires innerHTML for its digit animation
-      _costDisplay.innerHTML = value;
+      // Odometer.js watches MutationObserver for value changes
+      _costDisplay.textContent = value;
     } else {
       _costDisplay.textContent = formatCost(value);
     }
@@ -151,13 +151,7 @@ MeetingCost.Cost = (function () {
     document.addEventListener('timer:reset',     _onReset);
     document.addEventListener('settings:change', _onSettingsChange);
 
-    // Read current settings from Settings module (localStorage-restored values)
-    _attendees  = MeetingCost.Settings.getAttendees();
-    _hourlyRate = MeetingCost.Settings.getHourlyRate();
-    _currency   = MeetingCost.Settings.getCurrency();
-    _updateCurrencyDisplay();
-
-    // Initial render
+    // Initial render (settings:change event from Settings.init() will sync values)
     _renderCost(_totalCost);
     _updateResponsiveClass(_totalCost);
   }
