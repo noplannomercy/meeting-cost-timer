@@ -113,10 +113,13 @@ MeetingCost.History = (function () {
         mixedCurrency = true;
       }
     }
-    var displayCurrency = mixedCurrency ? '?' : firstCurrency;
     if (_totalEl) {
-      _totalEl.textContent = '합계: ' + displayCurrency +
-        MeetingCost.Cost.formatCost(totalSum);
+      if (mixedCurrency) {
+        _totalEl.textContent = '합계: (혼합 통화)';
+      } else {
+        _totalEl.textContent = '합계: ' + firstCurrency +
+          MeetingCost.Cost.formatCost(totalSum);
+      }
     }
 
     // Render items (newest-first, records[0] is newest)
