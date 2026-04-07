@@ -53,8 +53,12 @@ MeetingCost.Storage = (function() {
   function setWithRetry(key, value, retryFn) {
     if (set(key, value)) return true;
     if (typeof retryFn === 'function') {
-      retryFn();
-      return set(key, value);
+      var attempts = 0;
+      while (attempts < 10) {
+        retryFn();
+        if (set(key, value)) return true;
+        attempts++;
+      }
     }
     return false;
   }

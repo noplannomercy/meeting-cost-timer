@@ -103,13 +103,19 @@ MeetingCost.History = (function () {
 
     if (_emptyEl) { _emptyEl.style.display = 'none'; }
 
-    // Total cost sum
+    // Total cost sum + mixed currency check
     var totalSum = 0;
+    var firstCurrency = _records[0].currency || '';
+    var mixedCurrency = false;
     for (i = 0; i < _records.length; i++) {
       totalSum += _records[i].totalCost;
+      if ((_records[i].currency || '') !== firstCurrency) {
+        mixedCurrency = true;
+      }
     }
+    var displayCurrency = mixedCurrency ? '?' : firstCurrency;
     if (_totalEl) {
-      _totalEl.textContent = '합계: ' + (_records[0].currency || '') +
+      _totalEl.textContent = '합계: ' + displayCurrency +
         MeetingCost.Cost.formatCost(totalSum);
     }
 
@@ -162,7 +168,8 @@ MeetingCost.History = (function () {
   }
 
   function _onTimerStop(evt) {
-    var elapsed = (evt.detail && evt.detail.elapsed) ? evt.detail.elapsed : 0;
+    var elapsed = (evt.detail && typeof evt.detail.elapsed === 'number') ? evt.detail.elapsed : 0;
+    if (elapsed < 1) return;  // Don't save zero-duration meetings
 
     var record = {
       id:         String(Date.now()),

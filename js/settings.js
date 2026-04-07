@@ -39,7 +39,8 @@ MeetingCost.Settings = (function () {
     if (typeof saved.hourlyRate === 'number' && saved.hourlyRate >= 1) {
       _settings.hourlyRate = Math.floor(saved.hourlyRate);
     }
-    if (typeof saved.currency === 'string' && saved.currency) {
+    var VALID_CURRENCIES = ['₩', '$', '€'];
+    if (typeof saved.currency === 'string' && VALID_CURRENCIES.indexOf(saved.currency) !== -1) {
       _settings.currency = saved.currency;
     }
     if (typeof saved.theme === 'string' && saved.theme) {

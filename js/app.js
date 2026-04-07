@@ -78,7 +78,7 @@ MeetingCost.App = (function () {
       container.appendChild(toast);
 
       setTimeout(function () {
-        toast.classList.add('toast--exit');
+        toast.classList.add('toast--dismiss');
         setTimeout(function () {
           if (toast.parentNode) {
             toast.parentNode.removeChild(toast);

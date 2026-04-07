@@ -20,6 +20,7 @@ MeetingCost.Cost = (function () {
   // -----------------------------------------------------------
 
   function formatCost(value) {
+    if (value < 0) value = 0;
     var n = Math.round(value);
     var str = '' + n;
     var result = '';
@@ -149,6 +150,12 @@ MeetingCost.Cost = (function () {
     document.addEventListener('timer:tick',      _onTick);
     document.addEventListener('timer:reset',     _onReset);
     document.addEventListener('settings:change', _onSettingsChange);
+
+    // Read current settings from Settings module (localStorage-restored values)
+    _attendees  = MeetingCost.Settings.getAttendees();
+    _hourlyRate = MeetingCost.Settings.getHourlyRate();
+    _currency   = MeetingCost.Settings.getCurrency();
+    _updateCurrencyDisplay();
 
     // Initial render
     _renderCost(_totalCost);

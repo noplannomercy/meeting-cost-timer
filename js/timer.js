@@ -191,9 +191,19 @@ MeetingCost.Timer = (function () {
 
     if (_btnReset) {
       _btnReset.addEventListener('click', function () {
+        if (_state === STATE_RUNNING || _state === STATE_PAUSED) {
+          stop();
+        }
         reset();
       });
     }
+
+    // Auto-pause when tab/device sleeps to prevent inflated times
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && _state === STATE_RUNNING) {
+        pause();
+      }
+    });
 
     // Set initial display and button state
     _updateDisplay();
