@@ -128,8 +128,18 @@ MeetingCost.History = (function () {
 
       var item = document.createElement('div');
       item.className = 'history-item';
+      item.setAttribute('data-id', rec.id);
 
-      // Left: date + meta
+      // Delete background (revealed on swipe)
+      var deleteBg = document.createElement('div');
+      deleteBg.className = 'history-item__delete-bg';
+      deleteBg.textContent = '삭제';
+
+      // Content wrapper
+      var content = document.createElement('div');
+      content.className = 'history-item__content';
+
+      // Left: date + meta + title
       var left = document.createElement('div');
       left.className = 'history-item__left';
 
@@ -144,15 +154,124 @@ MeetingCost.History = (function () {
       left.appendChild(dateEl);
       left.appendChild(metaEl);
 
+      // Show title if exists
+      if (rec.title) {
+        var titleEl = document.createElement('div');
+        titleEl.className = 'history-item__title';
+        titleEl.textContent = rec.title;
+        left.appendChild(titleEl);
+      }
+
       // Right: cost
       var right = document.createElement('div');
       right.className = 'history-item__cost ' + _costClass(rec.duration);
       right.textContent = (rec.currency || '') + MeetingCost.Cost.formatCost(rec.totalCost);
 
-      item.appendChild(left);
-      item.appendChild(right);
+      content.appendChild(left);
+      content.appendChild(right);
+
+      // Memo section (expandable)
+      var memoSection = document.createElement('div');
+      memoSection.className = 'history-item__memo-section';
+      memoSection.textContent = rec.memo || '메모 없음';
+
+      item.appendChild(deleteBg);
+      item.appendChild(content);
+      item.appendChild(memoSection);
 
       _listEl.appendChild(item);
+    }
+
+    _attachSwipeHandlers();
+    _attachExpandHandlers();
+  }
+
+  // -----------------------------------------------------------
+  // Swipe + Expand handlers
+  // -----------------------------------------------------------
+
+  function _attachSwipeHandlers() {
+    var items = _listEl.querySelectorAll('.history-item');
+    for (var i = 0; i < items.length; i++) {
+      (function(item) {
+        var startX = 0, startY = 0, currentX = 0, swiping = false;
+        var contentEl = item.querySelector('.history-item__content');
+
+        function onStart(e) {
+          var point = e.touches ? e.touches[0] : e;
+          startX = point.clientX;
+          startY = point.clientY;
+          swiping = false;
+          item.classList.remove('history-item--swiping');
+        }
+
+        function onMove(e) {
+          var point = e.touches ? e.touches[0] : e;
+          var dx = point.clientX - startX;
+          var dy = point.clientY - startY;
+
+          if (!swiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+            swiping = true;
+            item.classList.add('history-item--swiping');
+          }
+
+          if (swiping && dx < 0) {
+            if (e.cancelable) { e.preventDefault(); }
+            currentX = dx;
+            contentEl.style.transform = 'translateX(' + dx + 'px)';
+          }
+        }
+
+        function onEnd() {
+          if (!swiping) return;
+          item.classList.remove('history-item--swiping');
+
+          if (currentX < -60) {
+            item.classList.add('history-item--removing');
+            var id = item.getAttribute('data-id');
+            setTimeout(function() {
+              var removed = remove(id);
+              if (removed) {
+                _showUndoToast(removed);
+              }
+            }, 300);
+          } else {
+            contentEl.style.transform = '';
+          }
+          currentX = 0;
+          swiping = false;
+        }
+
+        contentEl.addEventListener('touchstart', onStart, { passive: true });
+        contentEl.addEventListener('touchmove', onMove, { passive: false });
+        contentEl.addEventListener('touchend', onEnd);
+        contentEl.addEventListener('mousedown', onStart);
+        contentEl.addEventListener('mousemove', onMove);
+        contentEl.addEventListener('mouseup', onEnd);
+        contentEl.addEventListener('mouseleave', onEnd);
+      })(items[i]);
+    }
+  }
+
+  function _showUndoToast(record) {
+    document.dispatchEvent(new CustomEvent('toast:show-undo', {
+      detail: {
+        message: '삭제됨',
+        onUndo: function() { _undoDelete(record); }
+      }
+    }));
+  }
+
+  function _attachExpandHandlers() {
+    var items = _listEl.querySelectorAll('.history-item');
+    for (var i = 0; i < items.length; i++) {
+      (function(item) {
+        var content = item.querySelector('.history-item__content');
+        content.addEventListener('click', function() {
+          if (item.classList.contains('history-item--swiping')) return;
+          item.classList.toggle('history-item--expanded');
+        });
+      })(items[i]);
     }
   }
 
@@ -166,6 +285,47 @@ MeetingCost.History = (function () {
 
   function add(record) {
     _records.unshift(record); // newest first
+    _save();
+    render();
+  }
+
+  function remove(id) {
+    var idx = -1;
+    for (var i = 0; i < _records.length; i++) {
+      if (_records[i].id === id) { idx = i; break; }
+    }
+    if (idx === -1) return null;
+
+    var removed = _records.splice(idx, 1)[0];
+    _save();
+    render();
+    document.dispatchEvent(new CustomEvent('history:updated'));
+    return removed;
+  }
+
+  function _undoDelete(record) {
+    var inserted = false;
+    for (var i = 0; i < _records.length; i++) {
+      if (parseInt(record.id, 10) > parseInt(_records[i].id, 10)) {
+        _records.splice(i, 0, record);
+        inserted = true;
+        break;
+      }
+    }
+    if (!inserted) { _records.push(record); }
+    _save();
+    render();
+    document.dispatchEvent(new CustomEvent('history:updated'));
+  }
+
+  function update(id, fields) {
+    for (var i = 0; i < _records.length; i++) {
+      if (_records[i].id === id) {
+        if (fields.title !== undefined) { _records[i].title = fields.title; }
+        if (fields.memo !== undefined) { _records[i].memo = fields.memo; }
+        break;
+      }
+    }
     _save();
     render();
   }
@@ -205,6 +365,8 @@ MeetingCost.History = (function () {
     init:   init,
     getAll: getAll,
     add:    add,
+    remove: remove,
+    update: update,
     render: render
   };
 })();
