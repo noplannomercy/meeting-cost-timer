@@ -1,0 +1,35 @@
+{
+  "date": "2026-04-07",
+  "window": "7d",
+  "metrics": {
+    "commits": 34,
+    "contributors": 1,
+    "prs_merged": 0,
+    "insertions": 5701,
+    "deletions": 86,
+    "net_loc": 5615,
+    "test_loc": 0,
+    "test_ratio": 0,
+    "active_days": 1,
+    "sessions": 3,
+    "deep_sessions": 3,
+    "avg_session_minutes": 45,
+    "loc_per_session_hour": 2500,
+    "feat_pct": 0.47,
+    "fix_pct": 0.15,
+    "peak_hour": 10,
+    "ai_assisted_commits": 21
+  },
+  "authors": {
+    "vavagirls": {
+      "commits": 34,
+      "insertions": 5701,
+      "deletions": 86,
+      "test_ratio": 0,
+      "top_area": "js/"
+    }
+  },
+  "version_range": ["0.0.0", "1.1.0.0"],
+  "streak_days": 1,
+  "tweetable": "Apr 7: 34 commits, 5.7k LOC, 0→v1.1.0 in one day, 16 feat + 5 fix, 62% AI-assisted | 2 feature releases | Streak: 1d"
+}

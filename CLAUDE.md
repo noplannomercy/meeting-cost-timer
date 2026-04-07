@@ -49,6 +49,8 @@
 | js/stats.js | 통계 요약 + Canvas 스파크라인 |
 | js/app.js | 초기화, 탭 라우팅, 테마 토글, 토스트 |
 | vendor/odometer.min.js | Odometer.js 벤더링 |
+| VERSION | 4자리 버전 (MAJOR.MINOR.PATCH.MICRO) |
+| CHANGELOG.md | 릴리즈 변경 이력 |
 
 ## 하네스 진화 원칙
 - 구현 중 발견한 제약은 즉시 이 파일에 추가한다
