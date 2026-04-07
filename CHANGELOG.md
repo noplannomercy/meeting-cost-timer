@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0.0] - 2026-04-07
+
+### Added
+- Swipe-to-delete on history items with 3-second undo toast
+- Meeting memo modal on timer stop (title + content input, skip option)
+- Expandable history items showing memo text on click
+
+### Fixed
+- Memo section z-index behind swipe delete background
+- Swipe snap-back no longer triggers item expand
+- Dead code cleanup (unused _todayStr in history.js)
+
 ## [1.0.0.0] - 2026-04-07
 
 ### Added
