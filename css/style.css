@@ -937,3 +937,41 @@ body.stage-danger {
 .history-item__memo-save {
   align-self: flex-end;
 }
+
+/* ============================================
+   Undo toast
+   ============================================ */
+
+.toast--undo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.toast__undo-btn {
+  background: none;
+  border: 1px solid var(--btn-primary-text);
+  color: var(--btn-primary-text);
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.toast__undo-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   Modal input spacing
+   ============================================ */
+
+.modal .input {
+  margin-bottom: 8px;
+}
+
+.modal .input:last-of-type {
+  margin-bottom: 0;
+}
