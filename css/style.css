@@ -911,6 +911,8 @@ body.stage-danger {
 
 .history-item__memo-section {
   display: none;
+  position: relative;
+  z-index: 1;
   padding: 12px 20px;
   background-color: var(--surface-hover);
   border-top: 1px solid var(--border);
