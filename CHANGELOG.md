@@ -18,4 +18,4 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Mixed currency history total now shows "(혼합 통화)" instead of "?"
-- Pre-landing review: innerHTML replaced with textContent, hardcoded CSS colors moved to Custom Properties
+- CSS 색상값을 Custom Properties로 통일, innerHTML을 textContent로 교체 (보안 규칙 준수)
