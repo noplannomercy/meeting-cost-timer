@@ -546,17 +546,12 @@ body {
 }
 
 .history-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  transition: background-color 150ms ease-out;
+  overflow: hidden;
 }
 
-.history-item:hover {
+.history-item:hover .history-item__content {
   background-color: var(--surface-hover);
 }
 
@@ -797,4 +792,148 @@ body.stage-danger {
   max-width: 960px;
   margin: 0 auto;
   padding-bottom: 80px;
+}
+
+/* ============================================
+   Swipe Delete
+   ============================================ */
+
+.history-item {
+  position: relative;
+  touch-action: pan-y;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+}
+
+.history-item--swiping {
+  transition: none;
+}
+
+.history-item--removing {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.history-item__delete-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: var(--stage-danger);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 20px;
+  color: var(--btn-primary-text);
+  font-weight: 600;
+  z-index: 0;
+}
+
+.history-item__content {
+  position: relative;
+  z-index: 1;
+  background-color: var(--surface);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+/* ============================================
+   Modal
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+.modal-overlay--visible {
+  opacity: 1;
+}
+
+.modal {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.modal__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.btn--text {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.btn--text:hover {
+  color: var(--text);
+}
+
+/* ============================================
+   History Expand + Memo
+   ============================================ */
+
+.history-item__title {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.history-item__memo-section {
+  display: none;
+  padding: 12px 20px;
+  background-color: var(--surface-hover);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.history-item--expanded .history-item__memo-section {
+  display: block;
+}
+
+.history-item__memo-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.history-item__memo-edit .input {
+  font-size: 13px;
+  padding: 8px;
+}
+
+.history-item__memo-save {
+  align-self: flex-end;
 }
