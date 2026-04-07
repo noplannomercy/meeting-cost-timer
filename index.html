@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>몇 분이나 됐지?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/odometer-theme.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header__title">몇 분이나 됐지?</h1>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+  </header>
+
+  <!-- Main content -->
+  <main class="main">
+    <!-- Timer Tab -->
+    <section id="tab-timer" class="tab-content active">
+      <div class="timer-layout">
+        <!-- Left: Timer + Cost -->
+        <div class="timer-panel">
+          <div class="stage-indicators" id="stage-indicators">
+            <span class="stage-dot stage-dot--calm active" data-stage="calm"></span>
+            <span class="stage-dot stage-dot--warn" data-stage="warn"></span>
+            <span class="stage-dot stage-dot--alert" data-stage="alert"></span>
+            <span class="stage-dot stage-dot--danger" data-stage="danger"></span>
+          </div>
+
+          <div class="emotion-display" id="emotion-display">
+            <span class="emotion-display__emoji" id="emotion-emoji">😌</span>
+            <span class="emotion-display__message" id="emotion-message">순조롭습니다</span>
+          </div>
+
+          <div class="timer-display" id="timer-display">00:00:00</div>
+
+          <div class="cost-display-wrapper">
+            <span class="cost-currency" id="cost-currency">₩</span>
+            <div class="cost-display odometer" id="cost-display">0</div>
+          </div>
+
+          <div class="controls">
+            <button id="btn-start" class="btn btn--primary">▶ Start</button>
+            <button id="btn-pause" class="btn btn--primary" style="display:none;">⏸ Pause</button>
+            <button id="btn-reset" class="btn btn--secondary">Reset</button>
+          </div>
+        </div>
+
+        <!-- Right: Settings + Comparison -->
+        <div class="settings-panel">
+          <div class="settings-section">
+            <div class="settings-title">Settings</div>
+            <div class="input-group">
+              <label class="input-label" for="input-attendees">👥 Attendees</label>
+              <input class="input" type="number" id="input-attendees" value="5" min="1" max="100">
+              <span class="input-error" id="error-attendees"></span>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="input-rate">💰 Hourly Rate</label>
+              <input class="input" type="number" id="input-rate" value="35000" min="1">
+              <span class="input-error" id="error-rate"></span>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="input-currency">💱 Currency</label>
+              <select class="input" id="input-currency">
+                <option value="₩" selected>₩ (KRW)</option>
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="comparison-card" id="comparison-card">
+            <span class="comparison-card__emoji" id="comparison-emoji">☕</span>
+            <span class="comparison-card__text">
+              이 회의 비용 = <span class="comparison-card__highlight" id="comparison-text">커피 0잔</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History Tab -->
+    <section id="tab-history" class="tab-content">
+      <div class="history-header">
+        <h2 class="section-title">Meeting History</h2>
+        <span class="history-total" id="history-total"></span>
+      </div>
+      <div class="history-list" id="history-list">
+        <div class="empty-state" id="history-empty">아직 회의 기록이 없습니다</div>
+      </div>
+    </section>
+
+    <!-- Stats Tab -->
+    <section id="tab-stats" class="tab-content">
+      <h2 class="section-title">Statistics</h2>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card__label">총 회의 수</div>
+          <div class="stat-card__value" id="stat-count">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">총 비용</div>
+          <div class="stat-card__value" id="stat-total-cost">₩0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">평균 시간</div>
+          <div class="stat-card__value" id="stat-avg-time">00:00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">평균 비용</div>
+          <div class="stat-card__value" id="stat-avg-cost">₩0</div>
+        </div>
+      </div>
+      <div class="sparkline-wrapper">
+        <div class="sparkline-label">최근 회의 비용 추이</div>
+        <canvas id="sparkline-canvas" width="600" height="120"></canvas>
+        <div class="empty-state" id="stats-empty" style="display:none;">데이터가 부족합니다</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav">
+    <button class="tab active" data-tab="timer">⏱ Timer</button>
+    <button class="tab" data-tab="history">📋 History</button>
+    <button class="tab" data-tab="stats">📊 Stats</button>
+  </nav>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts (load order matters) -->
+  <script src="vendor/odometer.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/cost.js"></script>
+  <script src="js/emotion.js"></script>
+  <script src="js/comparisons.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
